@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ATELIER VÉRA — E-Commerce Clothing Store | HTML, CSS, JS & MySQL</title>
+  <!-- Google Fonts: Cormorant Garamond, Plus Jakarta Sans & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,400&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <!-- Tailwind CSS CDN (Exact Version) -->
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body class="min-h-screen flex flex-col bg-[#FAF8F5] text-[#141413] selection:bg-[#141413] selection:text-[#FAF8F5]">
+
+  <!-- Top Announcement & Stack Bar -->
+  <div class="bg-[#141413] text-[#FAF8F5] text-[11px] font-mono-num py-2 px-4 border-b border-[#141413]">
+    <div class="max-w-[1440px] mx-auto flex flex-wrap items-center justify-between gap-2">
+      <div class="flex items-center gap-2">
+        <span class="inline-block w-2 h-2 rounded-full bg-[#2E6F40]"></span>
+        <span>AUTUMN / WINTER '26 COLLECTION · COMPLIMENTARY EXPRESS SHIPPING OVER $250 (CODE: <button type="button" onclick="window.toggleCartDrawer(true); window.applyPromoCode('ATELIER15');" class="underline text-[#D8CEBE] hover:text-white">ATELIER15</button>)</span>
+      </div>
+      <div class="hidden sm:flex items-center gap-4 text-[#D8CEBE]">
+        <span>STACK: HTML5 · CSS3 · ES6 JS · MySQL 8.0</span>
+        <button type="button" onclick="window.switchView('mysql')" class="underline hover:text-white">Inspect MySQL Schema & VS Code Files →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sticky Architectural Navigation Header (68px) -->
+  <header class="sticky top-0 z-40 h-[68px] bg-[#FAF8F5]/90 backdrop-blur-md border-b border-[#E5E0D8]">
+    <div class="max-w-[1440px] mx-auto h-full px-4 sm:px-8 flex items-center justify-between gap-4">
+
+      <!-- Left: Primary Page Navigation -->
+      <div class="flex items-center gap-6">
+        <button
+          type="button"
+          onclick="window.toggleMobileNav()"
+          class="lg:hidden p-2 text-[#141413] hover:bg-[#F3EFEA] border border-[#E5E0D8]"
+          aria-label="Toggle Menu"
+        >
+          ☰
+        </button>
+
+        <nav class="hidden lg:flex items-center gap-7 text-xs uppercase tracking-[0.12em]">
+          <button type="button" data-nav-view="home" onclick="window.switchView('home')" class="nav-link-item active text-[#141413] font-semibold py-1">Home</button>
+          <button type="button" data-nav-view="shop" onclick="window.switchView('shop')" class="nav-link-item text-[#5C5A55] hover:text-[#141413] py-1">Shop Catalog</button>
+          <button type="button" data-nav-view="lookbook" onclick="window.switchView('lookbook')" class="nav-link-item text-[#5C5A55] hover:text-[#141413] py-1">Lookbook</button>
+          <button type="button" data-nav-view="mysql" onclick="window.switchView('mysql')" class="nav-link-item text-[#5C5A55] hover:text-[#141413] py-1 flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-[#9E472A]"></span>
+            <span>MySQL & VS Code</span>
+          </button>
+        </nav>
+      </div>
+
+      <!-- Center: Editorial Brand Wordmark -->
+      <div class="text-center">
+        <button type="button" onclick="window.switchView('home')" class="font-editorial text-2xl sm:text-3xl tracking-[0.18em] font-semibold text-[#141413]">
+          ATELIER VÉRA
+        </button>
+      </div>
+
+      <!-- Right: Search, Currency, Wishlist & Cart Bag -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        <!-- Quick Search Input (Desktop) -->
+        <div class="hidden xl:flex items-center border border-[#E5E0D8] bg-[#F3EFEA]/60 px-2.5 py-1.5">
+          <span class="text-xs text-[#8C8881] mr-1.5">⌕</span>
+          <input
+            id="headerSearchInput"
+            type="search"
+            placeholder="Search SKU or garment..."
+            oninput="window.handleSearchInput(this.value)"
+            class="bg-transparent text-xs text-[#141413] placeholder-[#8C8881] focus:outline-none w-40"
+          />
+        </div>
+
+        <!-- Currency Switcher -->
+        <div class="hidden md:inline-flex items-center border border-[#E5E0D8] bg-[#FAF8F5]">
+          <button type="button" data-curr-btn="USD" onclick="window.setCurrency('USD')" class="px-2 py-1 text-[11px] font-mono-num font-semibold bg-[#141413] text-[#FAF8F5]">USD</button>
+          <button type="button" data-curr-btn="INR" onclick="window.setCurrency('INR')" class="px-2 py-1 text-[11px] font-mono-num text-[#5C5A55] hover:text-[#141413]">INR</button>
+          <button type="button" data-curr-btn="EUR" onclick="window.setCurrency('EUR')" class="px-2 py-1 text-[11px] font-mono-num text-[#5C5A55] hover:text-[#141413]">EUR</button>
+        </div>
+
+        <!-- Wishlist Trigger -->
+        <button
+          type="button"
+          onclick="window.toggleWishlistDrawer(true)"
+          class="px-3 py-1.5 text-xs font-mono-num border border-[#E5E0D8] hover:border-[#141413] flex items-center gap-1.5 transition"
+          aria-label="Open Saved Garments"
+        >
+          <span>♡</span>
+          <span id="headerWishBadge">2</span>
+        </button>
+
+        <!-- Shopping Bag Trigger -->
+        <button
+          type="button"
+          onclick="window.toggleCartDrawer(true)"
+          class="px-3.5 py-1.5 text-xs font-mono-num uppercase tracking-wider bg-[#141413] text-[#FAF8F5] hover:bg-[#9E472A] flex items-center gap-2 transition"
+          aria-label="Open Shopping Bag"
+        >
+          <span>Bag</span>
+          <span id="headerCartBadge" class="px-1.5 py-0.2 bg-[#FAF8F5] text-[#141413] text-[10px] font-semibold">1</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Collapsible Mobile Navigation Menu -->
+    <div id="mobileNavMenu" class="hidden lg:hidden bg-[#FAF8F5] border-b border-[#E5E0D8] px-6 py-4 space-y-3 shadow-lg">
+      <div class="flex flex-col space-y-2 text-xs uppercase tracking-widest">
+        <button type="button" onclick="window.switchView('home')" class="text-left py-2 border-b border-[#E5E0D8] font-semibold">Home</button>
+        <button type="button" onclick="window.switchView('shop')" class="text-left py-2 border-b border-[#E5E0D8]">Shop Catalog</button>
+        <button type="button" onclick="window.switchView('lookbook')" class="text-left py-2 border-b border-[#E5E0D8]">Seasonal Lookbook</button>
+        <button type="button" onclick="window.switchView('mysql')" class="text-left py-2 text-[#9E472A] font-semibold">MySQL Schema & VS Code Project</button>
+      </div>
+      <div class="pt-2 flex items-center gap-2">
+        <span class="text-[11px] font-mono-num text-[#8C8881]">Currency:</span>
+        <button type="button" onclick="window.setCurrency('USD')" class="px-2 py-1 text-xs font-mono-num border border-[#E5E0D8]">USD $</button>
+        <button type="button" onclick="window.setCurrency('INR')" class="px-2 py-1 text-xs font-mono-num border border-[#E5E0D8]">INR ₹</button>
+        <button type="button" onclick="window.setCurrency('EUR')" class="px-2 py-1 text-xs font-mono-num border border-[#E5E0D8]">EUR €</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ========================================================================
+       MAIN MULTI-VIEW WORKSPACE
+       ======================================================================== -->
+  <main class="flex-1">
+
+    <!-- ======================================================================
+         VIEW 1: HOME (EDITORIAL CAMPAIGN + BENTO CATEGORIES + FEATURED)
+         ====================================================================== -->
+    <section id="view-home" class="view-animate">
+      <!-- Asymmetric Editorial Hero Section (12-Column Swiss Grid) -->
+      <div class="max-w-[1440px] mx-auto px-4 sm:px-8 pt-6 pb-12">
+        <div class="grid grid-cols-1 lg:grid-cols-12 border border-[#E5E0D8] bg-[#F3EFEA]/50">
+
+          <!-- Left 7 Columns: Sunlit Travertine Studio Photography -->
+          <div class="lg:col-span-7 relative min-h-[380px] sm:min-h-[520px] bg-[#E5E0D8] overflow-hidden">
+            <img
+              src="assets/hero-campaign.jpg"
+              alt="Atelier Véra Autumn Winter 2026 Campaign in Travertine Studio"
+              class="w-full h-full object-cover"
+            />
+            <!-- Floating Glassmorphic Garment Spotlight Card -->
+            <div
+              onclick="window.openProductModal(1)"
+              class="absolute bottom-4 left-4 right-4 sm:right-auto sm:max-w-xs bg-[#FAF8F5]/92 backdrop-blur-md border border-[#E5E0D8] p-3.5 cursor-pointer hover:border-[#141413] transition shadow-sm"
+            >
+              <div class="flex items-center justify-between gap-4">
+                <div>
+                  <span class="text-[10px] font-mono-num uppercase tracking-widest text-[#9E472A]">Campaign Spotlight · AV-AW26-001</span>
+                  <p class="text-xs font-semibold text-[#141413] mt-0.5">Double-Breasted Camel Wool Trench</p>
+                </div>
+                <span id="heroSpotlightPrice" class="text-xs font-mono-num font-semibold text-[#141413]">$420</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right 5 Columns: Editorial Manifesto & Primary CTAs -->
+          <div class="lg:col-span-5 p-6 sm:p-10 lg:p-12 flex flex-col justify-between bg-[#FAF8F5]">
+            <div>
+              <div class="inline-flex items-center gap-2 px-3 py-1 bg-[#F3EFEA] border border-[#E5E0D8] text-[11px] font-mono-num uppercase tracking-widest text-[#5C5A55]">
+                <span>Collection 04</span>
+                <span>·</span>
+                <span>Autumn / Winter 2026</span>
+              </div>
+
+              <h1 class="font-editorial text-4xl sm:text-5xl lg:text-[54px] text-[#141413] leading-[1.06] tracking-tight mt-5">
+                Architectural Silhouettes in Natural Fibre.
+              </h1>
+
+              <p class="text-sm text-[#5C5A55] leading-relaxed mt-5">
+                Crafted from RWS-certified virgin wool, 5-gauge Mongolian cashmere, and Belgian flax linen. Experience a responsive storefront engineered with clean HTML5, CSS3, ES6 JavaScript, and a relational MySQL backend.
+              </p>
+
+              <!-- Primary & Secondary Hero CTAs -->
+              <div class="mt-8 flex flex-wrap gap-3">
+                <button
+                  type="button"
+                  onclick="window.switchView('shop')"
+                  class="px-7 py-3.5 text-xs uppercase tracking-[0.14em] bg-[#141413] text-[#FAF8F5] hover:bg-[#9E472A] transition font-semibold"
+                >
+                  Explore Collection →
+                </button>
+                <button
+                  type="button"
+                  onclick="window.switchView('lookbook')"
+                  class="px-6 py-3.5 text-xs uppercase tracking-[0.14em] border border-[#141413] text-[#141413] hover:bg-[#F3EFEA] transition font-medium"
+                >
+                  View AW26 Lookbook
+                </button>
+              </div>
+            </div>
+
+            <!-- Live MySQL Telemetry Strip -->
+            <div class="mt-10 pt-6 border-t border-[#E5E0D8] grid grid-cols-3 gap-4">
+              <div>
+                <p class="text-[10px] font-mono-num uppercase tracking-wider text-[#8C8881]">MySQL Catalog</p>
+                <p class="text-lg font-mono-num font-semibold text-[#141413] mt-0.5"><span id="statTotalProducts">8</span> SKUs</p>
+              </div>
+              <div>
+                <p class="text-[10px] font-mono-num uppercase tracking-wider text-[#8C8881]">Live Inventory</p>
+                <p class="text-lg font-mono-num font-semibold text-[#141413] mt-0.5"><span id="statTotalStock">135</span> Units</p>
+              </div>
+              <div>
+                <p class="text-[10px] font-mono-num uppercase tracking-wider text-[#8C8881]">Committed Orders</p>
+                <p class="text-lg font-mono-num font-semibold text-[#2E6F40] mt-0.5"><span id="statTotalOrders">2</span> Active</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Category Bento Navigation Strip -->
+      <div class="max-w-[1440px] mx-auto px-4 sm:px-8 py-8">
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-6 border-b border-[#E5E0D8] pb-4">
+          <div>
+            <span class="text-[11px] font-mono-num uppercase tracking-widest text-[#9E472A]">Department Index</span>
+            <h2 class="font-editorial text-3xl text-[#141413] mt-1">Browse by Sartorial Category</h2>
+          </div>
+          <button type="button" onclick="window.switchView('shop', 'all')" class="text-xs uppercase tracking-widest text-[#141413] hover:text-[#9E472A] font-medium mt-2 sm:mt-0">
+            View All 8 Garments →
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <button
+            type="button"
+            onclick="window.switchView('shop', 'outerwear')"
+            class="group text-left p-6 bg-[#F3EFEA] border border-[#E5E0D8] hover:border-[#141413] transition flex flex-col justify-between h-44"
+          >
+            <div class="flex items-center justify-between w-full">
+              <span class="text-[11px] font-mono-num uppercase tracking-widest text-[#8C8881]">01 / DEPT</span>
+              <span class="text-xs font-mono-num text-[#141413] group-hover:translate-x-1 transition">→</span>
+            </div>
+            <div>
+              <h3 class="font-editorial text-2xl text-[#141413]">Outerwear & Trenches</h3>
+              <p class="text-xs text-[#5C5A55] mt-1">Italian camel wool, organic twill & Okayama selvedge</p>
+            </div>
+          </button>
+
+          <button
+            type="button"
+            onclick="window.switchView('shop', 'knitwear')"
+            class="group text-left p-6 bg-[#F3EFEA] border border-[#E5E0D8] hover:border-[#141413] transition flex flex-col justify-between h-44"
+          >
+            <div class="flex items-center justify-between w-full">
+              <span class="text-[11px] font-mono-num uppercase tracking-widest text-[#8C8881]">02 / DEPT</span>
+              <span class="text-xs font-mono-num text-[#141413] group-hover:translate-x-1 transition">→</span>
+            </div>
+            <div>
+              <h3 class="font-editorial text-2xl text-[#141413]">Heavyweight Knitwear</h3>
+              <p class="text-xs text-[#5C5A55] mt-1">5-gauge Grade-A Inner Mongolian ribbed cashmere</p>
+            </div>
+          </button>
+
+          <button
+            type="button"
+            onclick="window.switchView('shop', 'tailoring')"
+            class="group text-left p-6 bg-[#F3EFEA] border border-[#E5E0D8] hover:border-[#141413] transition flex flex-col justify-between h-44"
+          >
+            <div class="flex items-center justify-between w-full">
+              <span class="text-[11px] font-mono-num uppercase tracking-widest text-[#8C8881]">03 / DEPT</span>
+              <span class="text-xs font-mono-num text-[#141413] group-hover:translate-x-1 transition">→</span>
+            </div>
+            <div>
+              <h3 class="font-editorial text-2xl text-[#141413]">Tailoring & Dresses</h3>
+              <p class="text-xs text-[#5C5A55] mt-1">Double-pleat Belgian linen trousers & mulberry silk</p>
+            </div>
+          </button>
+
+          <button
+            type="button"
+            onclick="window.switchView('shop', 'accessories')"
+            class="group text-left p-6 bg-[#F3EFEA] border border-[#E5E0D8] hover:border-[#141413] transition flex flex-col justify-between h-44"
+          >
+            <div class="flex items-center justify-between w-full">
+              <span class="text-[11px] font-mono-num uppercase tracking-widest text-[#8C8881]">04 / DEPT</span>
+              <span class="text-xs font-mono-num text-[#141413] group-hover:translate-x-1 transition">→</span>
+            </div>
+            <div>
+              <h3 class="font-editorial text-2xl text-[#141413]">Leather & Footwear</h3>
+              <p class="text-xs text-[#5C5A55] mt-1">Vegetable-tanned saddle bags & Italian suede sneakers</p>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Featured Season Arrivals Grid -->
+      <div class="max-w-[1440px] mx-auto px-4 sm:px-8 py-10">
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-6 border-b border-[#E5E0D8] pb-4">
+          <div>
+            <span class="text-[11px] font-mono-num uppercase tracking-widest text-[#8C8881]">SELECT * FROM products WHERE is_featured = TRUE</span>
+            <h2 class="font-editorial text-3xl text-[#141413] mt-1">Featured Season Arrivals</h2>
+          </div>
+          <button
+            type="button"
+            onclick="window.switchView('shop', 'all')"
+            class="px-5 py-2.5 text-xs uppercase tracking-widest border border-[#141413] text-[#141413] hover:bg-[#141413] hover:text-[#FAF8F5] transition mt-3 sm:mt-0"
+          >
+            Open Full Filterable Catalog
+          </button>
+        </div>
+
+        <div id="homeFeaturedGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"></div>
+      </div>
+
+      <!-- Full-Stack Architecture Highlight Banner -->
+      <div class="max-w-[1440px] mx-auto px-4 sm:px-8 py-10">
+        <div class="bg-[#141413] text-[#FAF8F5] p-8 sm:p-12 border border-[#141413] grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          <div class="lg:col-span-8">
+            <span class="px-2.5 py-1 text-[10px] font-mono-num uppercase tracking-widest bg-[#9E472A] text-white">Team Web Development Architecture</span>
+            <h2 class="font-editorial text-3xl sm:text-4xl mt-3">Engineered for Real-World Shopping & VS Code Development</h2>
+            <p class="text-xs sm:text-sm text-[#D8CEBE] leading-relaxed mt-3 max-w-2xl">
+              Every filter click, search query, and checkout order on this storefront maps directly to structured MySQL 8.0 tables (<code class="text-white font-mono-num">products</code>, <code class="text-white font-mono-num">categories</code>, <code class="text-white font-mono-num">orders</code>, <code class="text-white font-mono-num">order_items</code>). Inspect the live database tables or copy the ready-to-run VS Code files.
+            </p>
+          </div>
+          <div class="lg:col-span-4 flex flex-col sm:flex-row lg:flex-col gap-3 justify-end">
+            <button
+              type="button"
+              onclick="window.switchView('mysql')"
+              class="w-full py-3.5 px-6 text-xs uppercase tracking-widest bg-[#FAF8F5] text-[#141413] hover:bg-[#D8CEBE] transition font-semibold text-center"
+            >
+              Launch MySQL & VS Code Console →
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         VIEW 2: SHOP CATALOG (FILTER RAIL + SEARCH/SORT + PRODUCT GRID)
+         ====================================================================== -->
+    <section id="view-shop" class="hidden">
+      <div class="max-w-[1440px] mx-auto px-4 sm:px-8 py-8">
+
+        <!-- Catalog Header & Live SQL Query Bar -->
+        <div class="border-b border-[#E5E0D8] pb-6 mb-8">
+          <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div>
+              <span class="text-[11px] font-mono-num uppercase tracking-widest text-[#9E472A]">ATELIER VÉRA · READY-TO-WEAR & ACCESSORIES</span>
+              <h1 class="font-editorial text-4xl text-[#141413] mt-1">All Clothing & Sartorial Editions</h1>
+            </div>
+            <p id="shopResultsCount" class="text-xs font-mono-num text-[#5C5A55]">Showing 8 of 8 garments</p>
+          </div>
+
+          <!-- Live Generated MySQL SELECT Query Banner -->
+          <div class="mt-4 bg-[#141413] text-[#E5E0D8] px-4 py-2.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div class="flex items-center gap-2 min-w-0">
+              <span class="px-2 py-0.5 text-[10px] font-mono-num uppercase bg-[#9E472A] text-white shrink-0">MySQL Live Query</span>
+              <code id="liveSqlQueryDisplay" class="text-[11px] font-mono-num truncate">SELECT * FROM products;</code>
+            </div>
+            <button
+              type="button"
+              onclick="window.switchView('mysql')"
+              class="text-[11px] font-mono-num underline text-[#D8CEBE] hover:text-white shrink-0 text-left sm:text-right"
+            >
+              Open in SQL Runner →
+            </button>
+          </div>
+        </div>
+
+        <!-- 2-Column Catalog Architecture: Left Sticky Filter Rail + Right Product Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+          <!-- Left Filter Rail (3 Columns on Desktop) -->
+          <aside class="lg:col-span-3 space-y-6">
+            <div class="bg-[#FAF8F5] border border-[#E5E0D8] p-5 space-y-6 sticky top-24">
+
+              <!-- Search Input -->
+              <div>
+                <label for="shopSearchInput" class="block text-[11px] font-mono-num uppercase tracking-wider text-[#5C5A55] mb-2">Keyword or SKU Search</label>
+                <input
+                  id="shopSearchInput"
+                  type="search"
+                  placeholder="e.g. Cashmere, Trench, AV-AW26..."
+                  oninput="window.handleSearchInput(this.value)"
+                  class="w-full px-3 py-2 text-xs bg-[#F3EFEA] border border-[#E5E0D8] text-[#141413] placeholder-[#8C8881] focus:outline-none focus:border-[#141413]"
+                />
+              </div>
+
+              <!-- Category Filter -->
+              <div>
+                <p class="text-[11px] font-mono-num uppercase tracking-wider text-[#5C5A55] mb-2">Category (`category_id`)</p>
+                <div class="space-y-1">
+                  <button type="button" data-cat-filter="all" onclick="window.setCategoryFilter('all')">
+                    <span>All Categories</span><span class="font-mono-num text-[11px]">8</span>
+                  </button>
+                  <button type="button" data-cat-filter="outerwear" onclick="window.setCategoryFilter('outerwear')">
+                    <span>Outerwear</span><span class="font-mono-num text-[11px]">3</span>
+                  </button>
+                  <button type="button" data-cat-filter="knitwear" onclick="window.setCategoryFilter('knitwear')">
+                    <span>Knitwear</span><span class="font-mono-num text-[11px]">1</span>
+                  </button>
+                  <button type="button" data-cat-filter="tailoring" onclick="window.setCategoryFilter('tailoring')">
+                    <span>Tailoring</span><span class="font-mono-num text-[11px]">1</span>
+                  </button>
+                  <button type="button" data-cat-filter="dresses" onclick="window.setCategoryFilter('dresses')">
+                    <span>Dresses</span><span class="font-mono-num text-[11px]">1</span>
+                  </button>
+                  <button type="button" data-cat-filter="accessories" onclick="window.setCategoryFilter('accessories')">
+                    <span>Accessories & Footwear</span><span class="font-mono-num text-[11px]">2</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Size Filter -->
+              <div>
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-[11px] font-mono-num uppercase tracking-wider text-[#5C5A55]">Size Filter</span>
+                  <button type="button" onclick="window.setSizeFilter('all')" class="text-[10px] font-mono-num underline text-[#8C8881] hover:text-[#141413]">All Sizes</button>
+                </div>
+                <div class="grid grid-cols-5 gap-1.5">
+                  <button type="button" data-size-filter="XS" onclick="window.setSizeFilter('XS')">XS</button>
+                  <button type="button" data-size-filter="S" onclick="window.setSizeFilter('S')">S</button>
+                  <button type="button" data-size-filter="M" onclick="window.setSizeFilter('M')">M</button>
+                  <button type="button" data-size-filter="L" onclick="window.setSizeFilter('L')">L</button>
+                  <button type="button" data-size-filter="XL" onclick="window.setSizeFilter('XL')">XL</button>
+                </div>
+              </div>
+
+              <!-- Price Ceiling Filter -->
+              <div>
+                <p class="text-[11px] font-mono-num uppercase tracking-wider text-[#5C5A55] mb-2">Price Ceiling (`price_usd`)</p>
+                <div class="space-y-1">
+                  <button type="button" data-price-filter="all" onclick="window.setPriceFilter('all')">All Price Points</button>
+                  <button type="button" data-price-filter="225" onclick="window.setPriceFilter('225')">Under $225 (₹18,900)</button>
+                  <button type="button" data-price-filter="300" onclick="window.setPriceFilter('300')">Under $300 (₹25,200)</button>
+                </div>
+              </div>
+
+              <!-- Sustainability Filter Toggle -->
+              <div class="pt-3 border-t border-[#E5E0D8]">
+                <button
+                  type="button"
+                  onclick="window.toggleSustainableFilter()"
+                  class="flex items-center gap-2.5 text-xs text-[#141413] hover:text-[#2E6F40] w-full text-left"
+                >
+                  <span id="sustainableToggleBox" class="w-4 h-4 flex items-center justify-center text-[11px] bg-white border border-[#8C8881]"></span>
+                  <span>Eco-Certified Materials Only</span>
+                </button>
+              </div>
+
+              <!-- Reset All Button -->
+              <button
+                type="button"
+                onclick="window.resetAllFilters()"
+                class="w-full py-2.5 text-xs font-mono-num uppercase tracking-widest border border-[#E5E0D8] text-[#5C5A55] hover:border-[#141413] hover:text-[#141413] transition"
+              >
+                Reset All Filters
+              </button>
+
+            </div>
+          </aside>
+
+          <!-- Right Catalog Grid (9 Columns on Desktop) -->
+          <div class="lg:col-span-9">
+
+            <!-- Toolbar: Active Filter Pills + Sort Select -->
+            <div class="flex flex-wrap items-center justify-between gap-4 mb-6 pb-4 border-b border-[#E5E0D8]">
+              <div id="activeFilterPills" class="flex flex-wrap items-center gap-2"></div>
+
+              <div class="flex items-center gap-2 ml-auto">
+                <label for="sortOrderSelect" class="text-[11px] font-mono-num uppercase tracking-wider text-[#5C5A55]">ORDER BY:</label>
+                <select
+                  id="sortOrderSelect"
+                  onchange="window.setSortOrder(this.value)"
+                  class="px-3 py-1.5 text-xs font-mono-num bg-[#F3EFEA] border border-[#E5E0D8] text-[#141413] focus:outline-none focus:border-[#141413]"
+                >
+                  <option value="featured">Featured First</option>
+                  <option value="price_asc">Price: Low to High (ASC)</option>
+                  <option value="price_desc">Price: High to Low (DESC)</option>
+                  <option value="rating">Customer Rating (DESC)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Responsive Product Cards Grid -->
+            <div id="shopProductsGrid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6"></div>
+
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         VIEW 3: LOOKBOOK (CURATED ENSEMBLES & ONE-CLICK OUTFIT SHOPPING)
+         ====================================================================== -->
+    <section id="view-lookbook" class="hidden">
+      <div class="max-w-[1440px] mx-auto px-4 sm:px-8 py-8">
+        <div class="border-b border-[#E5E0D8] pb-6 mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4">
+          <div>
+            <span class="text-[11px] font-mono-num uppercase tracking-widest text-[#9E472A]">AUTUMN / WINTER 2026 EDITORIAL ARCHIVE</span>
+            <h1 class="font-editorial text-4xl sm:text-5xl text-[#141413] mt-1">The Travertine Lookbook</h1>
+          </div>
+          <p class="text-xs text-[#5C5A55] max-w-md">
+            Three architectural ensembles styled for transitional layering. Add individual pieces or acquire the complete look in a single click.
+          </p>
+        </div>
+
+        <div id="lookbookSeriesContainer" class="space-y-12"></div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         VIEW 4: MYSQL BACKEND & VS CODE ARCHITECTURE CONSOLE
+         ====================================================================== -->
+    <section id="view-mysql" class="hidden">
+      <div class="max-w-[1440px] mx-auto px-4 sm:px-8 py-8 space-y-10">
+
+        <!-- Header -->
+        <div class="border-b border-[#E5E0D8] pb-6 flex flex-col lg:flex-row lg:items-end justify-between gap-4">
+          <div>
+            <span class="px-2.5 py-1 text-[10px] font-mono-num uppercase tracking-widest bg-[#141413] text-[#FAF8F5]">Full-Stack Project Architecture · VS Code Ready</span>
+            <h1 class="font-editorial text-4xl text-[#141413] mt-3">MySQL 8.0 Database & VS Code Source Console</h1>
+            <p class="text-xs sm:text-sm text-[#5C5A55] mt-1 max-w-2xl">
+              Inspect live relational tables (<code class="font-mono-num text-[#141413]">products</code>, <code class="font-mono-num text-[#141413]">categories</code>, <code class="font-mono-num text-[#141413]">orders</code>), run SQL queries against the storefront state, and copy the complete backend & frontend code for VS Code.
+            </p>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onclick="window.switchView('shop')"
+              class="px-4 py-2.5 text-xs uppercase tracking-wider border border-[#141413] text-[#141413] hover:bg-[#F3EFEA] transition"
+            >
+              ← Return to Storefront
+            </button>
+          </div>
+        </div>
+
+        <!-- Part A: Interactive SQL Query Runner & Live Table Inspector -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+          <!-- Left 5 Cols: Interactive SQL Query Console -->
+          <div class="lg:col-span-5 bg-[#FAF8F5] border border-[#E5E0D8] p-6 flex flex-col justify-between space-y-4">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-mono-num uppercase tracking-wider font-semibold text-[#141413]">Interactive MySQL Query Console</span>
+                <span class="text-[11px] font-mono-num text-[#2E6F40]">● atelier_vera_db connected</span>
+              </div>
+
+              <p class="text-xs text-[#5C5A55] mb-3">Click a preset relational query or run custom SQL to inspect live storefront data:</p>
+
+              <div class="flex flex-wrap gap-1.5 mb-3">
+                <button type="button" onclick="window.runPresetSqlQuery('join_catalog')" class="px-2.5 py-1 text-[11px] font-mono-num bg-[#F3EFEA] hover:bg-[#141413] hover:text-white border border-[#E5E0D8] transition">1. Products JOIN Categories</button>
+                <button type="button" onclick="window.runPresetSqlQuery('category_valuation')" class="px-2.5 py-1 text-[11px] font-mono-num bg-[#F3EFEA] hover:bg-[#141413] hover:text-white border border-[#E5E0D8] transition">2. GROUP BY Category Valuation</button>
+                <button type="button" onclick="window.runPresetSqlQuery('recent_orders')" class="px-2.5 py-1 text-[11px] font-mono-num bg-[#F3EFEA] hover:bg-[#141413] hover:text-white border border-[#E5E0D8] transition">3. Customer Orders Table</button>
+                <button type="button" onclick="window.runPresetSqlQuery('low_stock')" class="px-2.5 py-1 text-[11px] font-mono-num bg-[#F3EFEA] hover:bg-[#141413] hover:text-white border border-[#E5E0D8] transition">4. Low Stock Alert (≤16)</button>
+              </div>
+
+              <label for="customSqlQueryInput" class="sr-only">SQL Query Input</label>
+              <textarea
+                id="customSqlQueryInput"
+                rows="5"
+                class="w-full p-3 text-xs font-mono-num bg-[#141413] text-[#E5E0D8] border border-[#141413] focus:outline-none leading-relaxed"
+              >SELECT p.sku, p.title, c.name AS category, p.price_usd, p.stock_qty, p.rating
+FROM products p
+INNER JOIN categories c ON p.category_id = c.category_id
+ORDER BY p.price_usd DESC;</textarea>
+            </div>
+
+            <button
+              type="button"
+              onclick="window.executeCustomSql()"
+              class="w-full py-3 text-xs font-mono-num uppercase tracking-widest bg-[#9E472A] text-white hover:bg-[#141413] transition font-semibold"
+            >
+              ▶ Execute SQL Query
+            </button>
+          </div>
+
+          <!-- Right 7 Cols: Query Output Table -->
+          <div class="lg:col-span-7 bg-[#FAF8F5] border border-[#E5E0D8] p-6">
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-mono-num uppercase tracking-wider font-semibold text-[#141413]">Query Result Set</span>
+              <span class="text-[11px] font-mono-num text-[#8C8881]">InnoDB · utf8mb4_unicode_ci</span>
+            </div>
+            <div id="sqlQueryResultTable"></div>
+          </div>
+
+        </div>
+
+        <!-- Part B: Live Relational Database Tables Browser -->
+        <div class="bg-[#FAF8F5] border border-[#E5E0D8] p-6">
+          <div class="flex flex-wrap items-center justify-between gap-4 mb-4 pb-3 border-b border-[#E5E0D8]">
+            <div>
+              <h2 class="font-editorial text-2xl text-[#141413]">Live MySQL Table Explorer</h2>
+              <p class="text-xs text-[#5C5A55]">Place an order in the storefront to see new rows inserted into <code class="font-mono-num">orders</code> and stock decremented in <code class="font-mono-num">products</code>.</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button type="button" data-sql-table-btn="products" onclick="window.selectSqlTable('products')">TABLE: products</button>
+              <button type="button" data-sql-table-btn="categories" onclick="window.selectSqlTable('categories')">TABLE: categories</button>
+              <button type="button" data-sql-table-btn="orders" onclick="window.selectSqlTable('orders')">TABLE: orders</button>
+            </div>
+          </div>
+          <div id="mysqlTableDataContainer"></div>
+        </div>
+
+        <!-- Part C: VS Code Project Structure & Copyable Backend Code -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+          <!-- MySQL DDL Schema (backend/schema.sql) -->
+          <div class="lg:col-span-6 bg-[#FAF8F5] border border-[#E5E0D8] p-6">
+            <div class="flex items-center justify-between mb-3">
+              <div>
+                <span class="text-[10px] font-mono-num uppercase tracking-widest text-[#9E472A]">VS Code File 1</span>
+                <h3 class="text-sm font-mono-num font-semibold text-[#141413]">backend/schema.sql (MySQL 8.0 DDL & Seed)</h3>
+              </div>
+              <button
+                type="button"
+                onclick="window.copyCodeBlock('codeSchemaSql', 'backend/schema.sql')"
+                class="px-3 py-1.5 text-[11px] font-mono-num uppercase border border-[#141413] text-[#141413] hover:bg-[#141413] hover:text-white transition"
+              >
+                Copy SQL
+              </button>
+            </div>
+            <pre id="codeSchemaSql" class="bg-[#141413] text-[#E5E0D8] p-4 text-[11px] font-mono-num overflow-x-auto max-h-96 leading-relaxed">CREATE DATABASE IF NOT EXISTS atelier_vera_db;
+USE atelier_vera_db;
+
+CREATE TABLE categories (
+    category_id INT AUTO_INCREMENT PRIMARY KEY,
+    slug VARCHAR(50) NOT NULL UNIQUE,
+    name VARCHAR(100) NOT NULL,
+    description TEXT
+) ENGINE=InnoDB;
+
+CREATE TABLE products (
+    product_id INT AUTO_INCREMENT PRIMARY KEY,
+    sku VARCHAR(32) NOT NULL UNIQUE,
+    category_id INT NOT NULL,
+    title VARCHAR(180) NOT NULL,
+    price_usd DECIMAL(10, 2) NOT NULL,
+    stock_qty INT NOT NULL DEFAULT 20,
+    image_url VARCHAR(500) NOT NULL,
+    is_featured BOOLEAN DEFAULT FALSE,
+    FOREIGN KEY (category_id) REFERENCES categories(category_id)
+) ENGINE=InnoDB;
+
+CREATE TABLE orders (
+    order_id INT AUTO_INCREMENT PRIMARY KEY,
+    order_number VARCHAR(32) NOT NULL UNIQUE,
+    customer_name VARCHAR(120) NOT NULL,
+    customer_email VARCHAR(180) NOT NULL,
+    shipping_address TEXT NOT NULL,
+    city VARCHAR(100) NOT NULL,
+    postal_code VARCHAR(20) NOT NULL,
+    total_usd DECIMAL(10, 2) NOT NULL,
+    order_status VARCHAR(30) DEFAULT 'CONFIRMED',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;</pre>
+          </div>
+
+          <!-- Node.js + Express MySQL API (backend/server.js) -->
+          <div class="lg:col-span-6 bg-[#FAF8F5] border border-[#E5E0D8] p-6">
+            <div class="flex items-center justify-between mb-3">
+              <div>
+                <span class="text-[10px] font-mono-num uppercase tracking-widest text-[#2E6F40]">VS Code File 2</span>
+                <h3 class="text-sm font-mono-num font-semibold text-[#141413]">backend/server.js (Express + mysql2 REST API)</h3>
+              </div>
+              <button
+                type="button"
+                onclick="window.copyCodeBlock('codeServerJs', 'backend/server.js')"
+                class="px-3 py-1.5 text-[11px] font-mono-num uppercase border border-[#141413] text-[#141413] hover:bg-[#141413] hover:text-white transition"
+              >
+                Copy JS
+              </button>
+            </div>
+            <pre id="codeServerJs" class="bg-[#141413] text-[#E5E0D8] p-4 text-[11px] font-mono-num overflow-x-auto max-h-96 leading-relaxed">const express = require('express');
+const mysql = require('mysql2/promise');
+const cors = require('cors');
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+app.use(express.static('.'));
+
+const pool = mysql.createPool({
+  host: 'localhost',
+  user: 'root',
+  password: 'your_mysql_password',
+  database: 'atelier_vera_db'
+});
+
+app.get('/api/products', async (req, res) => {
+  const [rows] = await pool.query(
+    'SELECT p.*, c.name AS category FROM products p JOIN categories c ON p.category_id = c.category_id'
+  );
+  res.json(rows);
+});
+
+app.post('/api/orders', async (req, res) => {
+  const { orderNumber, customerName, customerEmail, city, total } = req.body;
+  const [result] = await pool.query(
+    'INSERT INTO orders (order_number, customer_name, customer_email, city, total_usd) VALUES (?, ?, ?, ?, ?)',
+    [orderNumber, customerName, customerEmail, city, total]
+  );
+  res.status(201).json({ orderId: result.insertId, orderNumber });
+});
+
+app.listen(3000, () => console.log('Server running on http://localhost:3000'));</pre>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ========================================================================
+       SLIDE-OVER SHOPPING BAG DRAWER (420px)
+       ======================================================================== -->
+  <div id="cartDrawerModal" class="hidden fixed inset-0 z-50 overflow-hidden">
+    <div onclick="window.toggleCartDrawer(false)" class="drawer-backdrop absolute inset-0"></div>
+    <div class="fixed inset-y-0 right-0 max-w-full flex pl-10">
+      <div class="drawer-panel w-screen max-w-[420px] bg-[#FAF8F5] border-l border-[#E5E0D8] shadow-2xl flex flex-col justify-between">
+
+        <!-- Drawer Header -->
+        <div class="p-5 border-b border-[#E5E0D8]">
+          <div class="flex items-center justify-between">
+            <h2 class="font-editorial text-2xl text-[#141413]">Shopping Bag</h2>
+            <button type="button" onclick="window.toggleCartDrawer(false)" class="text-[#5C5A55] hover:text-[#141413] text-lg px-2">✕</button>
+          </div>
+          <div id="freeShippingProgressBox" class="mt-3"></div>
+        </div>
+
+        <!-- Cart Line Items -->
+        <div id="cartItemsContainer" class="flex-1 overflow-y-auto px-5 divide-y divide-[#E5E0D8]"></div>
+
+        <!-- Cart Summary & Checkout Trigger -->
+        <div id="cartSummaryFooter" class="p-5 bg-[#F3EFEA]/70 border-t border-[#E5E0D8]"></div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       SLIDE-OVER WISHLIST DRAWER
+       ======================================================================== -->
+  <div id="wishlistDrawerModal" class="hidden fixed inset-0 z-50 overflow-hidden">
+    <div onclick="window.toggleWishlistDrawer(false)" class="drawer-backdrop absolute inset-0"></div>
+    <div class="fixed inset-y-0 right-0 max-w-full flex pl-10">
+      <div class="drawer-panel w-screen max-w-[380px] bg-[#FAF8F5] border-l border-[#E5E0D8] shadow-2xl flex flex-col justify-between">
+        <div class="p-5 border-b border-[#E5E0D8] flex items-center justify-between">
+          <div>
+            <h2 class="font-editorial text-2xl text-[#141413]">Saved Garments</h2>
+            <p class="text-[11px] text-[#8C8881]">Personal seasonal edit</p>
+          </div>
+          <button type="button" onclick="window.toggleWishlistDrawer(false)" class="text-[#5C5A55] hover:text-[#141413] text-lg px-2">✕</button>
+        </div>
+        <div id="wishlistItemsContainer" class="flex-1 overflow-y-auto px-5"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       PRODUCT QUICK-VIEW & SPECIFICATIONS MODAL
+       ======================================================================== -->
+  <div id="productDetailModal" class="hidden fixed inset-0 z-50 overflow-y-auto">
+    <div onclick="window.closeProductModal()" class="drawer-backdrop fixed inset-0"></div>
+    <div class="relative min-h-screen flex items-center justify-center p-4 sm:p-6">
+      <div id="productModalBody" class="relative z-10 w-full max-w-4xl bg-[#FAF8F5] border border-[#E5E0D8] shadow-2xl overflow-hidden"></div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       CHECKOUT & MYSQL ORDER TRANSACTION MODAL
+       ======================================================================== -->
+  <div id="checkoutModal" class="hidden fixed inset-0 z-50 overflow-y-auto">
+    <div onclick="window.closeCheckoutModal()" class="drawer-backdrop fixed inset-0"></div>
+    <div class="relative min-h-screen flex items-center justify-center p-4 sm:p-6">
+      <div class="relative z-10 w-full max-w-2xl bg-[#FAF8F5] border border-[#E5E0D8] shadow-2xl overflow-hidden">
+
+        <!-- Step 1: Shipping & Payment Form -->
+        <div id="checkoutFormStep" class="p-6 sm:p-8">
+          <div class="flex items-center justify-between border-b border-[#E5E0D8] pb-4 mb-6">
+            <div>
+              <span class="text-[10px] font-mono-num uppercase tracking-widest text-[#9E472A]">MySQL Order Transaction</span>
+              <h3 class="font-editorial text-3xl text-[#141413]">Express Courier Checkout</h3>
+            </div>
+            <button type="button" onclick="window.closeCheckoutModal()" class="text-[#5C5A55] hover:text-[#141413] text-lg px-2">✕</button>
+          </div>
+
+          <form onsubmit="window.submitCheckoutOrder(event)" class="grid grid-cols-1 md:grid-cols-12 gap-6">
+            <div class="md:col-span-7 space-y-4">
+              <div>
+                <label for="chkName" class="block text-[11px] font-mono-num uppercase tracking-wider text-[#5C5A55] mb-1">Full Name</label>
+                <input id="chkName" type="text" required value="Ananya Reddy" class="w-full px-3 py-2 text-xs bg-[#F3EFEA] border border-[#E5E0D8] focus:outline-none focus:border-[#141413]" />
+              </div>
+              <div>
+                <label for="chkEmail" class="block text-[11px] font-mono-num uppercase tracking-wider text-[#5C5A55] mb-1">Email Address</label>
+                <input id="chkEmail" type="email" required value="ananya.reddy@example.com" class="w-full px-3 py-2 text-xs bg-[#F3EFEA] border border-[#E5E0D8] focus:outline-none focus:border-[#141413]" />
+              </div>
+              <div>
+                <label for="chkAddress" class="block text-[11px] font-mono-num uppercase tracking-wider text-[#5C5A55] mb-1">Street Address</label>
+                <input id="chkAddress" type="text" required value="24 Beach Road, Lawson's Bay Colony" class="w-full px-3 py-2 text-xs bg-[#F3EFEA] border border-[#E5E0D8] focus:outline-none focus:border-[#141413]" />
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label for="chkCity" class="block text-[11px] font-mono-num uppercase tracking-wider text-[#5C5A55] mb-1">City</label>
+                  <input id="chkCity" type="text" required value="Visakhapatnam" class="w-full px-3 py-2 text-xs bg-[#F3EFEA] border border-[#E5E0D8] focus:outline-none focus:border-[#141413]" />
+                </div>
+                <div>
+                  <label for="chkPostal" class="block text-[11px] font-mono-num uppercase tracking-wider text-[#5C5A55] mb-1">Postal Code</label>
+                  <input id="chkPostal" type="text" required value="530017" class="w-full px-3 py-2 text-xs bg-[#F3EFEA] border border-[#E5E0D8] focus:outline-none focus:border-[#141413]" />
+                </div>
+              </div>
+            </div>
+
+            <div class="md:col-span-5 bg-[#F3EFEA] p-4 border border-[#E5E0D8] flex flex-col justify-between">
+              <div>
+                <p class="text-[11px] font-mono-num uppercase tracking-wider text-[#5C5A55] mb-3">Order Summary</p>
+                <div id="checkoutOrderSummaryBox"></div>
+              </div>
+              <button
+                type="submit"
+                class="mt-6 w-full py-3.5 text-xs uppercase tracking-widest bg-[#141413] text-[#FAF8F5] hover:bg-[#2E6F40] transition font-semibold"
+              >
+                Commit Order to MySQL →
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Step 2: Order Confirmation & SQL Log -->
+        <div id="checkoutReceiptStep" class="hidden"></div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Stack -->
+  <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none [&>*]:pointer-events-auto"></div>
+
+  <!-- Architectural Footer -->
+  <footer class="bg-[#F3EFEA] border-t border-[#E5E0D8] mt-16">
+    <div class="max-w-[1440px] mx-auto px-4 sm:px-8 py-12 grid grid-cols-1 md:grid-cols-4 gap-8 text-xs">
+      <div class="md:col-span-2 space-y-2">
+        <p class="font-editorial text-2xl tracking-[0.16em] text-[#141413] font-semibold">ATELIER VÉRA</p>
+        <p class="text-[#5C5A55] max-w-sm leading-relaxed">
+          Responsive Online Clothing Store built with semantic HTML5, modern CSS3, ES6 JavaScript, and a relational MySQL 8.0 database schema.
+        </p>
+      </div>
+      <div class="space-y-2">
+        <p class="font-mono-num uppercase tracking-wider text-[#141413] font-semibold">Navigation</p>
+        <ul class="space-y-1.5 text-[#5C5A55]">
+          <li><button type="button" onclick="window.switchView('home')" class="hover:text-[#141413]">Home Campaign</button></li>
+          <li><button type="button" onclick="window.switchView('shop')" class="hover:text-[#141413]">Product Listing Catalog</button></li>
+          <li><button type="button" onclick="window.switchView('lookbook')" class="hover:text-[#141413]">AW26 Editorial Lookbook</button></li>
+          <li><button type="button" onclick="window.switchView('mysql')" class="hover:text-[#141413]">MySQL Database & VS Code Files</button></li>
+        </ul>
+      </div>
+      <div class="space-y-2">
+        <p class="font-mono-num uppercase tracking-wider text-[#141413] font-semibold">Technical Specifications</p>
+        <p class="text-[#5C5A55]">Front End: HTML5, CSS3, JavaScript</p>
+        <p class="text-[#5C5A55]">Back End: MySQL 8.0 + Node/Express API</p>
+        <p class="text-[#8C8881] font-mono-num text-[11px] pt-2">© 2026 ATELIER VÉRA Team Project</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
